@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -ex
+
+bin/truncate-logs
+bin/push-source
+bin/restart
