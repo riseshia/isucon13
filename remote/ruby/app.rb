@@ -160,8 +160,6 @@ module Isupipe
       end
 
       def fill_user_response(tx, user_model)
-        theme_model = tx.xquery('SELECT * FROM themes WHERE user_id = ?', user_model.fetch(:id)).first
-
         icon_hash = user_model.fetch(:icon_hash, nil) || FALLBACK_IMAGE_HASH
 
         {
@@ -170,8 +168,8 @@ module Isupipe
           display_name: user_model.fetch(:display_name),
           description: user_model.fetch(:description),
           theme: {
-            id: theme_model.fetch(:id),
-            dark_mode: theme_model.fetch(:dark_mode),
+            id: user_model.fetch(:id),
+            dark_mode: user_model.fetch(:dark_mode),
           },
           icon_hash:,
         }
@@ -213,17 +211,14 @@ module Isupipe
 
       username = params[:username]
 
-      theme_model = db_transaction do |tx|
-        user_model = tx.xquery('SELECT id FROM users WHERE name = ?', username).first
-        unless user_model
-          raise HttpError.new(404)
-        end
-        tx.xquery('SELECT * FROM themes WHERE user_id = ?', user_model.fetch(:id)).first
+      user_model = db_conn.xquery('SELECT id, dark_mode FROM users WHERE name = ?', username).first
+      unless user_model
+        raise HttpError.new(404)
       end
 
       json(
-        id: theme_model.fetch(:id),
-        dark_mode: theme_model.fetch(:dark_mode),
+        id: user_model.fetch(:id),
+        dark_mode: user_model.fetch(:dark_mode),
       )
     end
 
@@ -827,10 +822,9 @@ module Isupipe
       hashed_password = BCrypt::Password.create(req.password, cost: BCRYPT_DEFAULT_COST)
 
       user = db_transaction do |tx|
-        tx.xquery('INSERT INTO users (name, display_name, description, password) VALUES(?, ?, ?, ?)', req.name, req.display_name, req.description, hashed_password)
+        tx.xquery('INSERT INTO users (name, display_name, description, password, dark_mode) VALUES(?, ?, ?, ?, ?)',
+                  req.name, req.display_name, req.description, hashed_password, req.theme.fetch(:dark_mode))
         user_id = tx.last_id
-
-        tx.xquery('INSERT INTO themes (user_id, dark_mode) VALUES(?, ?)', user_id, req.theme.fetch(:dark_mode))
 
         out, status = Open3.capture2e('pdnsutil', 'add-record', 'u.isucon.dev', req.name, 'A', '0', POWERDNS_SUBDOMAIN_ADDRESS)
         unless status.success?
@@ -842,6 +836,7 @@ module Isupipe
           name: req.name,
           display_name: req.display_name,
           description: req.description,
+          dark_mode: req.theme.fetch(:dark_mode),
         })
       end
 

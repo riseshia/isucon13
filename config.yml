@@ -40,6 +40,8 @@ sync_paths:
     local: remote/env-003.sh
   - remote: /home/isucon/webapp/ruby
     local: remote/ruby
+  - remote: /home/isucon/webapp/sql
+    local: remote/sql
   - remote: /etc/nginx/nginx.conf
     local: remote/nginx.conf
     root: true
