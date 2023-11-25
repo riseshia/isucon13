@@ -826,7 +826,7 @@ module Isupipe
                   req.name, req.display_name, req.description, hashed_password, req.theme.fetch(:dark_mode))
         user_id = tx.last_id
 
-        out, status = Open3.capture2e('pdnsutil', 'add-record', 'u.isucon.dev', req.name, 'A', '0', POWERDNS_SUBDOMAIN_ADDRESS)
+        out, status = Open3.capture2e('pdnsutil', 'add-record', 'u.isucon.dev', req.name, 'A', '120', POWERDNS_SUBDOMAIN_ADDRESS)
         unless status.success?
           raise HttpError.new(500, "pdnsutil failed with out=#{out}")
         end
