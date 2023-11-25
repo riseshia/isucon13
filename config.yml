@@ -7,7 +7,7 @@ sync_paths:
     local: remote/nginx.conf
     root: true
   - remote: /etc/nginx/sites-enabled/isupipe.conf
-    local: remote/nginx-isupipe.conf
+    local: remote/nginx-isupipe-001.conf
     root: true
   - remote: /etc/mysql/mysql.cnf
     local: remote/mysql.cnf
