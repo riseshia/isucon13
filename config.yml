@@ -33,6 +33,9 @@ sync_paths:
   - remote: /home/isucon/webapp/sql
     local: remote/sql
   isucon3:
+  - remote: /etc/systemd/system/isupipe-ruby.service
+    local: remote/isupipe-ruby.service
+    root: true
   - remote: /home/isucon/env.sh
     local: remote/env-003.sh
   - remote: /home/isucon/webapp/ruby
