@@ -43,6 +43,9 @@ sync_paths:
   - remote: /etc/nginx/sites-enabled/isupipe.conf
     local: remote/nginx-isupipe-003.conf
     root: true
+  - remote: /etc/mysql/mysql.cnf
+    local: remote/mysql.cnf
+    root: true
   - remote: /home/isucon/webapp/pdns
     local: remote/pdns
   - remote: /usr/share/pdns-backend-mysql/schema/schema.mysql.sql
@@ -66,6 +69,9 @@ log_paths:
     root: true
   - remote: /var/log/nginx/error.log
     local: log/isucon3/error.log
+    root: true
+  - remote: /var/log/mysql/slow.log
+    local: log/isucon3/mysql-slow.log
     root: true
 remote_commands:
   setup:
