@@ -727,6 +727,15 @@ module Isupipe
         unless user
           raise HttpError.new(404, 'not found user that has the given username')
         end
+
+        user_icon_hash = user.fetch(:icon_hash) || FALLBACK_IMAGE_HASH
+        request_icon_hash = request.env.fetch('HTTP_IF_NONE_MATCH', nil)
+        val = %Q("#{user_icon_hash}") # if-none-match には前後に " がついてる
+        # icon_hash があり、かつ、If-None-Match が一致したら304を返す
+        if val == request_icon_hash
+          halt 304
+        end
+
         tx.xquery('SELECT image FROM icons WHERE user_id = ?', user.fetch(:id)).first
       end
 
