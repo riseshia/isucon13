@@ -39,8 +39,8 @@ remote_commands:
   setup:
   - cd webapp/ruby
   restart:
-  # - sudo systemctl daemon-reload
-  # - sudo systemctl restart isupipe-ruby.service
+  - sudo systemctl daemon-reload
+  - sudo systemctl restart isupipe-ruby.service
   - sudo systemctl restart nginx.service
   - sudo systemctl restart mysql.service
 ssh:
