@@ -70,6 +70,7 @@ CREATE TABLE `livestream_viewers_history` (
   `livestream_id` BIGINT NOT NULL,
   `created_at` BIGINT NOT NULL
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+CREATE INDEX idx_lid_on_lsvh ON livestream_viewers_history(`livestream_id`);
 
 -- ライブ配信に対するライブコメント
 CREATE TABLE `livecomments` (
