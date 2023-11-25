@@ -914,49 +914,46 @@ module Isupipe
         end
 
         # ランク算出
-        users = tx.xquery('SELECT * FROM users').to_a
+        # users = tx.xquery('SELECT * FROM users').to_a
+        users = tx.xquery('SELECT id, name FROM users').to_a
 
-        ranking = users.map do |user|
-          reactions = tx.xquery(<<~SQL, user.fetch(:id), as: :array).first[0]
-            SELECT COUNT(*) FROM users u
-            INNER JOIN livestreams l ON l.user_id = u.id
+        ALL_SCORES_QUERY = <<~SQL
+          WITH reaction_cnt AS (
+            SELECT l.user_id as user_id, count(*) as cnt FROM livestreams l
             INNER JOIN reactions r ON r.livestream_id = l.id
-            WHERE u.id = ?
-          SQL
-
-          tips = tx.xquery(<<~SQL, user.fetch(:id), as: :array).first[0]
-            SELECT IFNULL(SUM(l2.tip), 0) FROM users u
-            INNER JOIN livestreams l ON l.user_id = u.id
+            GROUP BY l.user_id
+          ),
+          tips_sum AS (
+            SELECT l.user_id as user_id, sum(ifnull(tip, 0)) as tip_sum, count(*) as cmt_count
+            FROM livestreams l
             INNER JOIN livecomments l2 ON l2.livestream_id = l.id
-            WHERE u.id = ?
-          SQL
+            WHERE l2.tip is not null
+            GROUP BY l.user_id
+          )
+          select u.name as name,
+                 ifnull(ifnull(rc.cnt, 0) + ifnull(ts.tip_sum, 0), 0) as score,
+                 ifnull(rc.cnt, 0) as rt_count,
+                 ifnull(ts.tip_sum, 0) as tip_sum,
+                 ifnull(ts.cmt_count, 0) as cmt_count
+          from users u
+          left join reaction_cnt rc on u.id = rc.user_id
+          left join tips_sum ts on u.id = ts.user_id
+          order by score asc, name asc
+        SQL
+        ranking = tx.xquery(ALL_SCORES_QUERY, as: :array).to_a
 
-          score = reactions + tips
-          UserRankingEntry.new(username: user.fetch(:name), score:)
-        end
-
-        ranking.sort_by! { |entry| [entry.score, entry.username] }
-        ridx = ranking.rindex { |entry| entry.username == username }
+        ranking.sort_by! { |entry| [entry[1], entry[0]] }
+        ridx = ranking.rindex { |entry| entry[0] == username }
         rank = ranking.size - ridx
 
+        data = ranking[ridx]
         # リアクション数
-        total_reactions = tx.xquery(<<~SQL, username, as: :array).first[0]
-          SELECT COUNT(*) FROM users u
-          INNER JOIN livestreams l ON l.user_id = u.id
-          INNER JOIN reactions r ON r.livestream_id = l.id
-          WHERE u.name = ?
-        SQL
+        total_reactions = data[2]
 
         # ライブコメント数、チップ合計
-        total_livecomments = 0
-        total_tip = 0
+        total_livecomments = data[4]
+        total_tip = data[3]
         livestreams = tx.xquery('SELECT * FROM livestreams WHERE user_id = ?', user.fetch(:id))
-        livestreams.each do |livestream|
-          tx.xquery('SELECT * FROM livecomments WHERE livestream_id = ?', livestream.fetch(:id)).each do |livecomment|
-            total_tip += livecomment.fetch(:tip)
-            total_livecomments += 1
-          end
-        end
 
         # 合計視聴者数
         viewers_count = 0
