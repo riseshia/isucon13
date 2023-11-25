@@ -48,26 +48,18 @@ class CoverageResult
 
     <<~HTML
       <html>
-        <head>
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ruby.min.js"></script>
-          <style>
-          </style>
-        </head>
         <body>
           <table>
             <tr>
-              <td>
+              <td style="vertical-align: top;">
               <pre>#{meta_infos.join("\n")}</pre>
               </td>
               <td>
-                <pre><code class="language-ruby">#{codes.join}</code></pre>
+                <pre>#{codes.join}</pre>
               </td>
             </tr>
           </table>
 
-          <script>hljs.highlightAll();</script>
         </body>
       </html>
     HTML
