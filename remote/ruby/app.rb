@@ -162,14 +162,7 @@ module Isupipe
       def fill_user_response(tx, user_model)
         theme_model = tx.xquery('SELECT * FROM themes WHERE user_id = ?', user_model.fetch(:id)).first
 
-        icon_model = tx.xquery('SELECT image FROM icons WHERE user_id = ?', user_model.fetch(:id)).first
-        image =
-          if icon_model
-            icon_model.fetch(:image)
-          else
-            File.binread(FALLBACK_IMAGE)
-          end
-        icon_hash = Digest::SHA256.hexdigest(image)
+        icon_hash = user_model.fetch(:icon_hash, nil) || FALLBACK_IMAGE_HASH
 
         {
           id: user_model.fetch(:id),
@@ -724,6 +717,7 @@ module Isupipe
 
     BCRYPT_DEFAULT_COST = 4
     FALLBACK_IMAGE = '../img/NoImage.jpg'
+    FALLBACK_IMAGE_HASH = 'd9f8294e9d895f81ce62e73dc7d5dff862a4fa40bd4e0fecf53f7526a8edcac0'
 
     get '/api/user/:username/icon' do
       username = params[:username]
@@ -762,9 +756,18 @@ module Isupipe
       image = Base64.decode64(req.image)
 
       icon_id = db_transaction do |tx|
-        tx.xquery('DELETE FROM icons WHERE user_id = ?', user_id)
+        has_row = tx.xquery('SELECT 1 FROM icons WHERE user_id = ? LIMIT 1', user_id)
+        if has_row.first
+          tx.xquery('DELETE FROM icons WHERE user_id = ?', user_id)
+        end
         tx.xquery('INSERT INTO icons (user_id, image) VALUES (?, ?)', user_id, image)
-        tx.last_id
+        iid = tx.last_id
+
+        # 一緒に更新しとく
+        icon_hash = Digest::SHA256.hexdigest(image)
+        tx.xquery('UPDATE users SET icon_hash = ? WHERE id = ?', icon_hash, user_id)
+
+        iid
       end
 
       status 201
