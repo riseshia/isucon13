@@ -18,6 +18,11 @@ sync_paths:
     local: remote/ruby
   - remote: /home/isucon/webapp/sql
     local: remote/sql
+  - remote: /home/isucon/webapp/pdns
+    local: remote/pdns
+  - remote: /usr/share/pdns-backend-mysql/schema/schema.mysql.sql
+    local: remote/pdns-schema.mysql.sql
+    root: true
   # isucon2:
   # - remote: /home/isucon/webapp/ruby
   #   local: remote/ruby
