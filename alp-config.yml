@@ -2,7 +2,7 @@
 file: log/isucon1/access.log
 sort: sum                     # max|min|avg|sum|count|uri|method|max-body|min-body|avg-body|sum-body|p1|p50|p99|stddev
 # reverse:                    # boolean
-query_string: true
+query_string: false
 # query_string_ignore_values: # boolean
 # decode_uri:                 # boolean
 # format:                     # string
@@ -10,7 +10,16 @@ query_string: true
 # noheaders:                  # boolean
 # show_footers:               # boolean
 matching_groups:
-  - "/api/player/competition/[0-9a-f]+/ranking"
+  - "/api/user/[0-9a-zA-Z]+/icon"
+  - "/api/livestream/[0-9]+/reaction"
+  - "/api/livestream/[0-9]+/livecomment"
+  - "/api/livestream/[0-9]+/report"
+  - "/api/livestream/[0-9]+/moderate"
+  - "/api/livestream/[0-9]+/ngwords"
+  - "/api/livestream/[0-9]+/enter"
+  - "/api/livestream/[0-9]+/exit"
+  - "/api/livestream/[0-9]+"
+  - "/api/user/[0-9a-zA-Z]+/statistics"
 # filters:                    # string
 output: "count,1xx,2xx,3xx,4xx,5xx,method,uri,min,max,sum,avg,p90,p95,p99"
 # pos_file:                   # string
