@@ -104,7 +104,7 @@ module Isupipe
 
       def fill_livestream_response(tx, livestream_model)
         owner_model = tx.xquery('SELECT * FROM users WHERE id = ?', livestream_model.fetch(:user_id)).first
-        owner = fill_user_response(tx, owner_model)
+        owner = fill_user_response(owner_model)
 
         tags = tx.xquery('SELECT * FROM livestream_tags WHERE livestream_id = ?', livestream_model.fetch(:id)).map do |livestream_tag_model|
           tag_model = tx.xquery('SELECT * FROM tags WHERE id = ?', livestream_tag_model.fetch(:tag_id)).first
@@ -122,7 +122,7 @@ module Isupipe
 
       def fill_livecomment_response(tx, livecomment_model)
         comment_owner_model = tx.xquery('SELECT * FROM users WHERE id = ?', livecomment_model.fetch(:user_id)).first
-        comment_owner = fill_user_response(tx, comment_owner_model)
+        comment_owner = fill_user_response(comment_owner_model)
 
         livestream_model = tx.xquery('SELECT * FROM livestreams WHERE id = ?', livecomment_model.fetch(:livestream_id)).first
         livestream = fill_livestream_response(tx, livestream_model)
@@ -135,7 +135,7 @@ module Isupipe
 
       def fill_livecomment_report_response(tx, report_model)
         reporter_model = tx.xquery('SELECT * FROM users WHERE id = ?', report_model.fetch(:user_id)).first
-        reporter = fill_user_response(tx, reporter_model)
+        reporter = fill_user_response(reporter_model)
 
         livecomment_model = tx.xquery('SELECT * FROM livecomments WHERE id = ?', report_model.fetch(:livecomment_id)).first
         livecomment = fill_livecomment_response(tx, livecomment_model)
@@ -148,7 +148,7 @@ module Isupipe
 
       def fill_reaction_response(tx, reaction_model)
         user_model = tx.xquery('SELECT * FROM users WHERE id = ?', reaction_model.fetch(:user_id)).first
-        user = fill_user_response(tx, user_model)
+        user = fill_user_response(user_model)
 
         livestream_model = tx.xquery('SELECT * FROM livestreams WHERE id = ?', reaction_model.fetch(:livestream_id)).first
         livestream = fill_livestream_response(tx, livestream_model)
@@ -159,7 +159,7 @@ module Isupipe
         )
       end
 
-      def fill_user_response(tx, user_model)
+      def fill_user_response(user_model)
         icon_hash = user_model.fetch(:icon_hash, nil) || FALLBACK_IMAGE_HASH
 
         {
@@ -191,9 +191,7 @@ module Isupipe
 
     # top
     get '/api/tag' do
-      tag_models = db_transaction do |tx|
-        tx.query('SELECT * FROM tags')
-      end
+      tag_models = db_conn.query('SELECT * FROM tags')
 
       json(
         tags: tag_models.map { |tag_model|
@@ -792,13 +790,11 @@ module Isupipe
         raise HttpError.new(401)
       end
 
-      user = db_transaction do |tx|
-        user_model = tx.xquery('SELECT * FROM users WHERE id = ?', user_id).first
-        unless user_model
-          raise HttpError.new(404)
-        end
-        fill_user_response(tx, user_model)
+      user_model = db_conn.xquery('SELECT * FROM users WHERE id = ?', user_id).first
+      unless user_model
+        raise HttpError.new(404)
       end
+      user = fill_user_response(user_model)
 
       json(user)
     end
@@ -831,7 +827,7 @@ module Isupipe
           raise HttpError.new(500, "pdnsutil failed with out=#{out}")
         end
 
-        fill_user_response(tx, {
+        fill_user_response({
           id: user_id,
           name: req.name,
           display_name: req.display_name,
@@ -885,14 +881,12 @@ module Isupipe
 
       username = params[:username]
 
-      user = db_transaction do |tx|
-        user_model = tx.xquery('SELECT * FROM users WHERE name = ?', username).first
-        unless user_model
-          raise HttpError.new(404)
-        end
-
-        fill_user_response(tx, user_model)
+      user_model = db_conn.xquery('SELECT * FROM users WHERE name = ?', username).first
+      unless user_model
+        raise HttpError.new(404)
       end
+
+      user = fill_user_response(user_model)
 
       json(user)
     end
@@ -1037,9 +1031,7 @@ module Isupipe
     end
 
     get '/api/payment' do
-      total_tip = db_transaction do |tx|
-        tx.xquery('SELECT IFNULL(SUM(tip), 0) FROM livecomments', as: :array).first[0]
-      end
+      total_tip = db_conn.xquery('SELECT IFNULL(SUM(tip), 0) FROM livecomments', as: :array).first[0]
 
       json(total_tip:)
     end
