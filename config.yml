@@ -18,11 +18,6 @@ sync_paths:
     local: remote/ruby
   - remote: /home/isucon/webapp/sql
     local: remote/sql
-  - remote: /home/isucon/webapp/pdns
-    local: remote/pdns
-  - remote: /usr/share/pdns-backend-mysql/schema/schema.mysql.sql
-    local: remote/pdns-schema.mysql.sql
-    root: true
   isucon2:
   - remote: /etc/mysql/mysql.cnf
     local: remote/mysql.cnf
@@ -47,6 +42,11 @@ sync_paths:
     root: true
   - remote: /etc/nginx/sites-enabled/isupipe.conf
     local: remote/nginx-isupipe-003.conf
+    root: true
+  - remote: /home/isucon/webapp/pdns
+    local: remote/pdns
+  - remote: /usr/share/pdns-backend-mysql/schema/schema.mysql.sql
+    local: remote/pdns-schema.mysql.sql
     root: true
 log_paths:
   isucon1:
