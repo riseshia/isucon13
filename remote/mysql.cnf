@@ -20,9 +20,9 @@
 !includedir /etc/mysql/conf.d/
 !includedir /etc/mysql/mysql.conf.d/
 
-[mysqld]
-slow_query_log=ON
-long_query_time=0.1
-log_queries_not_using_indexes=ON
-log_output=FILE
-slow_query_log_file=/var/log/mysql/slow.log
+# [mysqld]
+# slow_query_log=ON
+# long_query_time=0.1
+# log_queries_not_using_indexes=ON
+# log_output=FILE
+# slow_query_log_file=/var/log/mysql/slow.log
