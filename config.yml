@@ -26,9 +26,17 @@ sync_paths:
   # isucon2:
   # - remote: /home/isucon/webapp/ruby
   #   local: remote/ruby
-  # isucon3:
-  # - remote: /home/isucon/webapp/ruby
-  #   local: remote/ruby
+  isucon3:
+  - remote: /home/isucon/env.sh
+    local: remote/env-003.sh
+  - remote: /home/isucon/webapp/ruby
+    local: remote/ruby
+  - remote: /etc/nginx/nginx.conf
+    local: remote/nginx.conf
+    root: true
+  - remote: /etc/nginx/sites-enabled/isupipe.conf
+    local: remote/nginx-isupipe-003.conf
+    root: true
 log_paths:
   isucon1:
   - remote: /var/log/nginx/access.log
@@ -39,6 +47,13 @@ log_paths:
     root: true
   - remote: /var/log/mysql/slow.log
     local: log/isucon1/mysql-slow.log
+    root: true
+  isucon3:
+  - remote: /var/log/nginx/access.log
+    local: log/isucon3/access.log
+    root: true
+  - remote: /var/log/nginx/error.log
+    local: log/isucon3/error.log
     root: true
 remote_commands:
   setup:
