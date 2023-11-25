@@ -56,7 +56,7 @@ log_paths:
     root: true
   isucon2:
   - remote: /var/log/mysql/slow.log
-    local: log/isucon1/mysql-slow.log
+    local: log/isucon2/mysql-slow.log
     root: true
   isucon3:
   - remote: /var/log/nginx/access.log
