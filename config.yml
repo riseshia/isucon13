@@ -13,7 +13,7 @@ sync_paths:
     local: remote/mysql.cnf
     root: true
   - remote: /home/isucon/env.sh
-    local: remote/env.sh
+    local: remote/env-001.sh
   - remote: /home/isucon/webapp/ruby
     local: remote/ruby
   - remote: /home/isucon/webapp/sql
@@ -23,9 +23,15 @@ sync_paths:
   - remote: /usr/share/pdns-backend-mysql/schema/schema.mysql.sql
     local: remote/pdns-schema.mysql.sql
     root: true
-  # isucon2:
-  # - remote: /home/isucon/webapp/ruby
-  #   local: remote/ruby
+  isucon2:
+  - remote: /etc/mysql/mysql.cnf
+    local: remote/mysql.cnf
+    root: true
+  - remote: /etc/mysql/mysql.conf.d/mysqld.cnf
+    local: remote/mysqld-002.cnf
+    root: true
+  - remote: /home/isucon/webapp/sql
+    local: remote/sql
   isucon3:
   - remote: /home/isucon/env.sh
     local: remote/env-003.sh
@@ -45,6 +51,7 @@ log_paths:
   - remote: /var/log/nginx/error.log
     local: log/isucon1/error.log
     root: true
+  isucon2:
   - remote: /var/log/mysql/slow.log
     local: log/isucon1/mysql-slow.log
     root: true
