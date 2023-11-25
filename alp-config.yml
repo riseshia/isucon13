@@ -1,5 +1,5 @@
 ---
-file: log/isucon1/access.log
+file: log/isucon3/access.log
 sort: sum                     # max|min|avg|sum|count|uri|method|max-body|min-body|avg-body|sum-body|p1|p50|p99|stddev
 # reverse:                    # boolean
 query_string: false
